@@ -4,7 +4,7 @@
 
 class UBoxComponent;
 class URaceCarMovementComponent;
-
+class URacePowerup;
 
 UCLASS()
 class ARaceCar : public APawn
@@ -17,17 +17,18 @@ public:
 	void SetupPlayerInputComponent(UInputComponent* InputComp) override;
 	void HandleAccelerateInput(float Value);
 	void HandleTurnInput(float Value);
+	void HandleActivatePowerup();
+	void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere)
 	UBoxComponent* BoxCollision;
 
+	UPROPERTY(VisibleAnywhere)
 	URaceCarMovementComponent* MoveComp;
-	FVector2D MoveInput;
-
-	FQuat LastFallingRotationAmount;
 
 	UPROPERTY(EditAnywhere)
-	float FallRotationAmount = 20.f;
+	TSubclassOf<URacePowerup> PowerupClass;
 
-	bool IsGrounded = true;
+	UPROPERTY() //or TWeakObjectPtr
+	URacePowerup* Powerup;
 };

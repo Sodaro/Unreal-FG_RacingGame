@@ -1,5 +1,33 @@
 #include "RaceCarMovementComponent.h"
 #include "RaceCar.h"
+void URaceCarMovementComponent::HandleGround(float DeltaTime)
+{
+	UWorld* World = GetWorld();
+	FVector FrontStartLocation = Car->GetActorLocation() + FVector{ 100,0,0 };
+	FVector FrontEndLocation = FrontStartLocation + FVector{ 0,0,-200 };
+	FVector BackStartLocation = Car->GetActorLocation() + FVector{ -100,0,0 };
+	FVector BackEndLocation = BackStartLocation + FVector{ 0,0,-200 };
+	FHitResult FrontHit, BackHit;
+	World->LineTraceSingleByChannel(FrontHit, FrontStartLocation, FrontEndLocation, ECollisionChannel::ECC_WorldStatic);
+	World->LineTraceSingleByChannel(BackHit, BackStartLocation, BackEndLocation, ECollisionChannel::ECC_WorldStatic);
+
+	IsGrounded = FrontHit.bBlockingHit || BackHit.bBlockingHit;
+
+	if (BackHit.bBlockingHit && !FrontHit.bBlockingHit)
+	{
+		LastFallingRotationAmount = FQuat::MakeFromEuler({ 0,FallRotationAmount,0 });
+	}
+	else if (!BackHit.bBlockingHit && FrontHit.bBlockingHit)
+	{
+		LastFallingRotationAmount = FQuat::MakeFromEuler({ 0,-FallRotationAmount,0 });
+	}
+
+	if (!LastFallingRotationAmount.IsIdentity())
+	{
+		Car->AddActorLocalRotation(LastFallingRotationAmount * DeltaTime);
+	}
+
+}
 void URaceCarMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -11,24 +39,50 @@ URaceCarMovementComponent::URaceCarMovementComponent()
 }
 void URaceCarMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	FVector2D Input = Car->MoveInput;
 
-	if (Input.Y != 0 && Car->IsGrounded)
-	{
-		if (Input.Y < 0)
-		{
-			CurrentSpeed -= CurrentSpeed * BrakeFactor * DeltaTime;
-		}
-		else
-		{
-			CurrentSpeed += AccelerationRate * DeltaTime;
-		}
-		Velocity = Car->GetActorForwardVector() * CurrentSpeed;
-	}
+	//HandleGround(DeltaTime);
+    FVector ForwardVec = Car->GetActorForwardVector();
+    FVector Location = Car->GetActorLocation();
 
-	if (!Car->IsGrounded)
-	{
-		Velocity += FVector{ 0,0,-10 }*DeltaTime;
-	}
-	Car->AddActorWorldOffset(Velocity * DeltaTime);
+    // Apply acceleration
+    Velocity += ForwardVec * AccelerationRate * MoveInput.Y * DeltaTime;
+
+    // Apply friction (Acceleration friction)
+    FVector RollingVelocity = Velocity.ProjectOnTo(ForwardVec);
+    FVector GripVelocity = Velocity - RollingVelocity;
+
+    RollingVelocity -= RollingVelocity * RollFriction * DeltaTime;
+    GripVelocity -= GripVelocity * GripFriction * DeltaTime;
+
+    Velocity = RollingVelocity + GripVelocity;
+
+    // Apply movement
+    float RemainingTime = DeltaTime;
+    while (RemainingTime > 0.f)
+    {
+        FHitResult Hit;
+        Car->AddActorWorldOffset(Velocity * RemainingTime, true, &Hit);
+
+        // Hit something
+        if (Hit.bBlockingHit)
+        {
+            // Depenetration
+            if (Hit.bStartPenetrating)
+            {
+                Car->AddActorWorldOffset(Hit.Normal * (Hit.PenetrationDepth + 1.f));
+            }
+            // Otherwise, just redirect and keep going
+            else
+            {
+                Velocity = FVector::VectorPlaneProject(Velocity, Hit.Normal);
+                RemainingTime -= RemainingTime * Hit.Time;
+            }
+        }
+        else
+        {
+            break;
+        }
+    }
+    float Speed = Velocity.Size();
+    Car->AddActorWorldRotation(FRotator(0.f, TurnSpeed * MoveInput.X * DeltaTime, 0.f));
 }

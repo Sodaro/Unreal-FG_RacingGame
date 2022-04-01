@@ -11,21 +11,34 @@ class URaceCarMovementComponent : public UActorComponent
 
 	ARaceCar* Car;
 
+
+	void HandleGround(float DeltaTime);
 public:
 	virtual void BeginPlay() override;
 	URaceCarMovementComponent();
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	float CurrentSpeed = 0.f;
+	UPROPERTY(EditAnywhere)
+	float AccelerationRate = 1000.f;
 
 	UPROPERTY(EditAnywhere)
-	float MaxSpeed = 500.f;
+	float RollFriction = 0.8;
 
 	UPROPERTY(EditAnywhere)
-	float AccelerationRate = 100.f;
+	float GripFriction = 4.0f;
+
 
 	UPROPERTY(EditAnywhere)
-	float BrakeFactor = 0.75f;
+	float TurnSpeed = 0.5f;
+
+	FVector2D MoveInput;
 
 	FVector Velocity;
+
+	FQuat LastFallingRotationAmount;
+
+	UPROPERTY(EditAnywhere)
+	float FallRotationAmount = 20.f;
+
+	bool IsGrounded = true;
 };

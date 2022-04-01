@@ -2,38 +2,27 @@
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "RaceCarMovementComponent.h"
+#include "FG_RacingGame/Powerup/RacePowerup.h"
 ARaceCar::ARaceCar()
 {
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Collision"));
 	RootComponent = BoxCollision;
 	MoveComp = CreateDefaultSubobject<URaceCarMovementComponent>(TEXT("MovementComponent"));
+	PrimaryActorTick.bCanEverTick = true;
 }
 
-void ARaceCar::Tick(float DeltaTime)
+void ARaceCar::BeginPlay()
 {
-	UWorld* World = GetWorld();
-	FVector FrontStartLocation = GetActorLocation() + FVector{ 100,0,0 };
-	FVector FrontEndLocation = FrontStartLocation + FVector{ 0,0,-200 };
-	FVector BackStartLocation = GetActorLocation() + FVector{ -100,0,0 };
-	FVector BackEndLocation = BackStartLocation + FVector{0,0,-200};
-	FHitResult FrontHit, BackHit;
-	World->LineTraceSingleByChannel(FrontHit, FrontStartLocation, FrontEndLocation, ECollisionChannel::ECC_WorldStatic);
-	World->LineTraceSingleByChannel(BackHit, BackStartLocation, BackEndLocation, ECollisionChannel::ECC_WorldStatic);
-	
-	IsGrounded = FrontHit.bBlockingHit || BackHit.bBlockingHit;
+	Super::BeginPlay();
+}
 
-	if (BackHit.bBlockingHit && !FrontHit.bBlockingHit)
-	{
-		LastFallingRotationAmount = FQuat::MakeFromEuler({ 0,FallRotationAmount,0 });
-	}
-	else if (!BackHit.bBlockingHit && FrontHit.bBlockingHit)
-	{
-		LastFallingRotationAmount = FQuat::MakeFromEuler({ 0,-FallRotationAmount,0 });
-	}
 
-	if (!LastFallingRotationAmount.IsIdentity())
+void ARaceCar::Tick(float DeltaSeconds)
+{
+	//Super::Tick(DeltaSeconds);
+	if (Powerup != nullptr)
 	{
-		AddActorLocalRotation(LastFallingRotationAmount * DeltaTime);
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 0.f, FColor::Emerald, Powerup->GetClass()->GetName(), true, FVector2D(4.f));
 	}
 }
 
@@ -41,6 +30,7 @@ void ARaceCar::SetupPlayerInputComponent(UInputComponent* InputComp)
 {
 	InputComp->BindAxis(TEXT("Accelerate"), this, &ARaceCar::HandleAccelerateInput);
 	InputComp->BindAxis(TEXT("Turn"), this, &ARaceCar::HandleTurnInput);
+	InputComp->BindAction(TEXT("Powerup"), IE_Pressed, this, &ARaceCar::HandleActivatePowerup);
 }
 void ARaceCar::HandleAccelerateInput(float Value)
 {
@@ -53,7 +43,7 @@ void ARaceCar::HandleAccelerateInput(float Value)
 			FColor::Magenta,
 			FString::Printf(TEXT("Accelerate: %f"), Value));
 	}
-	MoveInput.Y = Value;
+	MoveComp->MoveInput.Y = Value;
 
 }
 void ARaceCar::HandleTurnInput(float Value)
@@ -67,5 +57,13 @@ void ARaceCar::HandleTurnInput(float Value)
 			FColor::Magenta,
 			FString::Printf(TEXT("Turn: %f"), Value));
 	}
-	MoveInput.X = Value;
+	MoveComp->MoveInput.X = Value;
 }
+
+void ARaceCar::HandleActivatePowerup()
+{
+	if (Powerup != nullptr)
+		Powerup->OnPowerupActivated();
+}
+
+
