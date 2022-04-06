@@ -6,6 +6,21 @@ class URacePowerup : public UObject
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION(BlueprintImplementableEvent)
+	
+	UFUNCTION(BlueprintNativeEvent)
+	void Setup();
+
+	UFUNCTION(BlueprintNativeEvent)
 	void OnPowerupActivated();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void TickActive(float DeltaTime);
+
+	UFUNCTION(BlueprintNativeEvent)
+	bool ShouldDeactivate();
+
+
+	UFUNCTION(BlueprintCallable)
+	AActor* GetOwner() { return Cast<AActor>(GetOuter()); }
+
 };

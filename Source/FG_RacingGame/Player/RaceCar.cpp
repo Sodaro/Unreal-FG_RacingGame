@@ -19,10 +19,21 @@ void ARaceCar::BeginPlay()
 
 void ARaceCar::Tick(float DeltaSeconds)
 {
-	//Super::Tick(DeltaSeconds);
 	if (Powerup != nullptr)
 	{
 		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 0.f, FColor::Emerald, Powerup->GetClass()->GetName(), true, FVector2D(4.f));
+		
+		if (bPowerupActivated)
+		{
+			Powerup->TickActive(DeltaSeconds);
+			if (Powerup->ShouldDeactivate())
+			{
+				bPowerupActivated = false;
+				Powerup = nullptr;
+			}
+				
+		}
+			
 	}
 }
 
@@ -62,8 +73,19 @@ void ARaceCar::HandleTurnInput(float Value)
 
 void ARaceCar::HandleActivatePowerup()
 {
-	if (Powerup != nullptr)
+	if (Powerup != nullptr && !bPowerupActivated)
+	{
 		Powerup->OnPowerupActivated();
+		bPowerupActivated = true;
+	}
+		
+}
+
+
+void ARaceCar::EquipPowerup(URacePowerup* InPowerup)
+{
+	Powerup = InPowerup;
+	Powerup->Setup();
 }
 
 

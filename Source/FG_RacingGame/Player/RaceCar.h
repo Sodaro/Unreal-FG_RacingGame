@@ -13,12 +13,16 @@ class ARaceCar : public APawn
 
 public:
 	ARaceCar();
+	void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	void SetupPlayerInputComponent(UInputComponent* InputComp) override;
 	void HandleAccelerateInput(float Value);
 	void HandleTurnInput(float Value);
 	void HandleActivatePowerup();
-	void BeginPlay() override;
+	void EquipPowerup(URacePowerup* InPowerup);
+
+	bool HasEquippedPowerup() { return Powerup != nullptr; }
+	
 
 	UPROPERTY(VisibleAnywhere)
 	UBoxComponent* BoxCollision;
@@ -31,4 +35,5 @@ public:
 
 	UPROPERTY() //or TWeakObjectPtr
 	URacePowerup* Powerup;
+	bool bPowerupActivated = false;
 };

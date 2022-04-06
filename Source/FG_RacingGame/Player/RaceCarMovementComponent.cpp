@@ -83,6 +83,15 @@ void URaceCarMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTy
             break;
         }
     }
-    float Speed = Velocity.Size();
-    Car->AddActorWorldRotation(FRotator(0.f, TurnSpeed * MoveInput.X * DeltaTime, 0.f));
+    float Speed = FVector::DotProduct(Velocity, Car->GetActorForwardVector());
+    Car->AddActorWorldRotation(FRotator(0.f, TurnSpeed * Speed * MoveInput.X * DeltaTime, 0.f));
+}
+void URaceCarMovementComponent::AddForce(const FVector& Force)
+{
+    Velocity += Force * GetWorld()->GetDeltaSeconds();
+}
+
+void URaceCarMovementComponent::AddImpulse(const FVector& Impulse)
+{
+    Velocity += Impulse;
 }

@@ -19,7 +19,10 @@ void ARacePowerupPickup::HandleOverlap(UPrimitiveComponent* OverlappedComponent,
 	if (OtherActor->IsA<ARaceCar>())
 	{
 		ARaceCar* Car = Cast<ARaceCar>(OtherActor);
-		Car->Powerup = NewObject<URacePowerup>(Car, PowerupClass);
-		Destroy();
+		if (!Car->HasEquippedPowerup())
+		{
+			Car->EquipPowerup(NewObject<URacePowerup>(Car, PowerupClass));
+			Destroy();
+		}
 	}
 }

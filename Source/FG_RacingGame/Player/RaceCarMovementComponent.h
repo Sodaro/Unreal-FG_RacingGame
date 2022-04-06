@@ -18,6 +18,10 @@ public:
 	URaceCarMovementComponent();
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	void AddForce(const FVector& Force);
+	void AddImpulse(const FVector& Impulse);
+
+
 	UPROPERTY(EditAnywhere)
 	float AccelerationRate = 1000.f;
 
