@@ -58,7 +58,9 @@ void URaceCarMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 
     // Apply movement
     float RemainingTime = DeltaTime;
-    while (RemainingTime > 0.f)
+
+    int Iterations = 0;
+    while (RemainingTime > 0.f && ++Iterations < 10)
     {
         FHitResult Hit;
         Car->AddActorWorldOffset(Velocity * RemainingTime, true, &Hit);
@@ -69,7 +71,7 @@ void URaceCarMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTy
             // Depenetration
             if (Hit.bStartPenetrating)
             {
-                Car->AddActorWorldOffset(Hit.Normal * (Hit.PenetrationDepth + 1.f));
+                Car->AddActorWorldOffset(Hit.Normal * (Hit.PenetrationDepth + 0.1f));
             }
             // Otherwise, just redirect and keep going
             else
@@ -82,6 +84,10 @@ void URaceCarMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTy
         {
             break;
         }
+    }
+    if (Iterations == 10)
+    {
+        UE_LOG(LogTemp, Log, TEXT("We're stuck!"));
     }
     float Speed = FVector::DotProduct(Velocity, Car->GetActorForwardVector());
     Car->AddActorWorldRotation(FRotator(0.f, TurnSpeed * Speed * MoveInput.X * DeltaTime, 0.f));

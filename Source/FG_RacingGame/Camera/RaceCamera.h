@@ -22,7 +22,7 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* Camera;
 
-	UPROPERTY(EditINstanceOnly, Category = "Camera Follow")
+	UPROPERTY(EditInstanceOnly, Category = "Camera Follow")
 	AActor* FollowActor;
 
 	UPROPERTY(EditAnywhere, Category = "Camera Follow|Advanced")
