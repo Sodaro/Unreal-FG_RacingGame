@@ -14,4 +14,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = Turtle)
 	TSubclassOf<ARaceTurtleShell> TurtleClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	float SpawnOffset = 200.f;
 };

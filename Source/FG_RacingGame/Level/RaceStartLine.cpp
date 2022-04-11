@@ -2,6 +2,7 @@
 #include "FG_RacingGame/Player/RaceCar.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "../Game/RaceGameInstance.h"
 
 ARaceStartLine::ARaceStartLine()
 {
@@ -25,7 +26,10 @@ void ARaceStartLine::BeginPlay()
 
 		PlayerController->bAutoManageActiveCameraTarget = false;		
 		auto Car = GetWorld()->SpawnActor<ARaceCar>(CarClass, SpawnTransform);
-		GetWorld()->GetFirstPlayerController()->Possess(Car);
+		PlayerController->Possess(Car);
+
+		URaceGameInstance* GameInstance = URaceGameInstance::Get(this);
+		GameInstance->Cars.Add(Car);
 
 		SpawnTransform.AddToTranslation(GetActorRightVector() * 200.f);
 	}

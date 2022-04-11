@@ -14,6 +14,7 @@ class ARaceCar : public APawn
 public:
 	ARaceCar();
 	void BeginPlay() override;
+	void EndPlay(const EEndPlayReason::Type Reason) override;
 	virtual void Tick(float DeltaTime) override;
 	void SetupPlayerInputComponent(UInputComponent* InputComp) override;
 	void HandleAccelerateInput(float Value);

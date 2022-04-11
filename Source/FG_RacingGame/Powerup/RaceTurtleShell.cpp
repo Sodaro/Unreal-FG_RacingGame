@@ -1,6 +1,6 @@
 #include "RaceTurtleShell.h"
 #include "Components/SphereComponent.h"
-
+#include "../Player/RaceCar.h"
 ARaceTurtleShell::ARaceTurtleShell()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -21,5 +21,19 @@ void ARaceTurtleShell::Tick(float DeltaTime)
 	AddActorWorldOffset(ShellVelocity * DeltaTime, true, &Hit);
 
 	if (Hit.bBlockingHit)
+	{
+		if (Hit.Actor->IsA<ARaceCar>())
+		{
+			Hit.Actor->Destroy();
+			Destroy();
+			return;
+		}
+
+		if (Hit.bStartPenetrating)
+		{
+			AddActorWorldOffset(Hit.Normal * Hit.PenetrationDepth + 0.01f);
+		}
 		ShellVelocity = ShellVelocity.MirrorByVector(Hit.Normal);
+	}
+		
 }

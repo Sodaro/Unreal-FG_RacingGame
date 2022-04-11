@@ -3,6 +3,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "RaceCarMovementComponent.h"
 #include "FG_RacingGame/Powerup/RacePowerup.h"
+#include "../Game/RaceGameInstance.h"
 ARaceCar::ARaceCar()
 {
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Collision"));
@@ -14,6 +15,13 @@ ARaceCar::ARaceCar()
 void ARaceCar::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void ARaceCar::EndPlay(const EEndPlayReason::Type Reason)
+{
+	Super::EndPlay(Reason);
+	URaceGameInstance* GameInstance = URaceGameInstance::Get(this);
+	GameInstance->Cars.Remove(this);
 }
 
 
