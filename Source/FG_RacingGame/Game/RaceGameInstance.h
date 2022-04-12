@@ -15,7 +15,7 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Race|Game Instance", Meta = (DisplayName = "GetRaceGameInstance", WorldContext="WorldContext"))//context is parameter name
 	static URaceGameInstance* Get(UObject* WorldContext);
-	
+
 	UPROPERTY(BlueprintReadOnly)
 	TArray<ARaceCar*> Cars;
 };

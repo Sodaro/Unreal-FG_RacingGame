@@ -11,3 +11,8 @@ URaceGameInstance* URaceGameInstance::Get(UObject* WorldContext)
 	UWorld* World = WorldContext->GetWorld();
 	return World->GetGameInstance<URaceGameInstance>();
 }
+
+int URaceGameInstance::CoolThing(size_t x, size_t y, size_t z)
+{
+	return 0;
+}
