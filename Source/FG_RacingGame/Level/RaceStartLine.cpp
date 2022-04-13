@@ -1,8 +1,10 @@
 #include "RaceStartLine.h"
 #include "FG_RacingGame/Player/RaceCar.h"
 #include "Kismet/GameplayStatics.h"
-
 #include "../Game/RaceGameInstance.h"
+#include "../Game/RaceGameMode.h"
+#include "../UI/RaceOverlayWidget.h"
+#include "../UI/RacePlayerStatusWidget.h"
 
 ARaceStartLine::ARaceStartLine()
 {
@@ -26,10 +28,15 @@ void ARaceStartLine::BeginPlay()
 
 		PlayerController->bAutoManageActiveCameraTarget = false;		
 		auto Car = GetWorld()->SpawnActor<ARaceCar>(CarClass, SpawnTransform);
+		Car->PlayerIndex = i;
 		PlayerController->Possess(Car);
 
 		URaceGameInstance* GameInstance = URaceGameInstance::Get(this);
 		GameInstance->Cars.Add(Car);
+
+		ARaceGameMode* CoolGameMode = ARaceGameMode::Get(this);
+		CoolGameMode->OverlayWidget->AddPlayerStatusWidget(i);
+		CoolGameMode->OverlayWidget->StatusWidgets[i]->SetPlayerName(FString::Printf(TEXT("Player %d"), i + 1));
 
 		SpawnTransform.AddToTranslation(GetActorRightVector() * 200.f);
 	}

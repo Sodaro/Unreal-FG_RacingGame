@@ -3,17 +3,23 @@
 #include "GameFramework/GameMode.h"
 #include "RaceGameMode.generated.h"
 
-class UUserWidget;
+class URaceOverlayWidget;
 
 UCLASS()
 class ARaceGameMode : public AGameMode
 {
 	GENERATED_BODY()
 public:
+	UFUNCTION(BlueprintPure, Category = "Race|GameMode", Meta = (DisplayName = "GetRaceGameMode", WorldContext = "WorldContext"))//context is parameter name
+	static ARaceGameMode* Get(UObject* WorldContext);
+	
 	ARaceGameMode();
 
-	void BeginPlay() override;
+	void StartMatch() override;
 
 	UPROPERTY(EditDefaultsOnly, Category = Widgets)
-	TSubclassOf<UUserWidget> OverlayWidgetClass;
+	TSubclassOf<URaceOverlayWidget> OverlayWidgetClass;
+
+	UPROPERTY()
+	URaceOverlayWidget* OverlayWidget;
 };

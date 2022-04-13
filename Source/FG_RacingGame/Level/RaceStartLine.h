@@ -19,5 +19,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Race)
 	TSubclassOf<ARaceCar> CarClass;
 
-	int NumberOfPlayers = 1;
+	UPROPERTY(EditInstanceOnly)
+	int32 NumberOfPlayers = 1;
 };

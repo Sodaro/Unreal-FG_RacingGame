@@ -4,6 +4,10 @@
 #include "RaceCarMovementComponent.h"
 #include "FG_RacingGame/Powerup/RacePowerup.h"
 #include "../Game/RaceGameInstance.h"
+#include "../Game/RaceGameMode.h"
+#include "../UI/RaceOverlayWidget.h"
+#include "../UI/RacePlayerStatusWidget.h"
+
 ARaceCar::ARaceCar()
 {
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Collision"));
@@ -38,10 +42,9 @@ void ARaceCar::Tick(float DeltaSeconds)
 			{
 				bPowerupActivated = false;
 				Powerup = nullptr;
+				EquipPowerup(Powerup);
 			}
-				
 		}
-			
 	}
 }
 
@@ -85,15 +88,17 @@ void ARaceCar::HandleActivatePowerup()
 	{
 		Powerup->OnPowerupActivated();
 		bPowerupActivated = true;
-	}
-		
+	}		
 }
-
 
 void ARaceCar::EquipPowerup(URacePowerup* InPowerup)
 {
 	Powerup = InPowerup;
-	Powerup->Setup();
+	if (Powerup != nullptr)
+		Powerup->Setup();
+
+	auto* GameMode = ARaceGameMode::Get(this);
+	auto* StatusWidget = GameMode->OverlayWidget->StatusWidgets[PlayerIndex];
+
+	StatusWidget->SetEquippedPowerup(InPowerup);
 }
-
-

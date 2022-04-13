@@ -24,6 +24,7 @@ public:
 
 	bool HasEquippedPowerup() { return Powerup != nullptr; }
 	
+	int32 PlayerIndex = 0;
 
 	UPROPERTY(VisibleAnywhere)
 	UBoxComponent* BoxCollision;

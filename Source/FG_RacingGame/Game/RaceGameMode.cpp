@@ -1,15 +1,17 @@
 #include "RaceGameMode.h"
-#include "Blueprint/UserWidget.h"
+#include "../UI/RaceOverlayWidget.h"
+ARaceGameMode* ARaceGameMode::Get(UObject* WorldContext)
+{
+	return WorldContext->GetWorld()->GetAuthGameMode<ARaceGameMode>();
+}
 ARaceGameMode::ARaceGameMode()
 {
 	DefaultPawnClass = nullptr;
-
 }
 
-void ARaceGameMode::BeginPlay()
+void ARaceGameMode::StartMatch()
 {
-	Super::BeginPlay();
-
-	auto* Overlay = NewObject<UUserWidget>(this, OverlayWidgetClass);
-	Overlay->AddToViewport();
+	OverlayWidget = NewObject<URaceOverlayWidget>(this, OverlayWidgetClass);
+	OverlayWidget->AddToViewport();
+	Super::StartMatch();
 }

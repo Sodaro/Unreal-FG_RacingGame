@@ -2,6 +2,9 @@
 #include "Blueprint/UserWidget.h"
 #include "RaceOverlayWidget.generated.h"
 
+class UCanvasPanel;
+class URacePlayerStatusWidget;
+
 UCLASS()
 class URaceOverlayWidget : public UUserWidget
 {
@@ -10,6 +13,12 @@ public:
 	void NativeConstruct() override;
 	void AddPlayerStatusWidget(int PlayerIndex);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	UCanvasPanel* GetMainCanvas();
+
 	UPROPERTY(EditAnywhere, Category = RaceOverlay)
-	TSubclassOf<UUserWidget> PlayerWidgetClass;
+	TSubclassOf<URacePlayerStatusWidget> PlayerWidgetClass;
+
+	UPROPERTY()
+	TArray<URacePlayerStatusWidget*> StatusWidgets;
 };
